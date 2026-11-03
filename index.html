@@ -126,7 +126,26 @@ html.l-en .de, html:not(.l-en) .en{display:none!important}
 .lang button{all:unset;cursor:pointer;font:600 .8rem/1 var(--sans);letter-spacing:.04em;padding:7px 11px;border-radius:999px;color:var(--mute)}
 .lang button[aria-pressed="true"]{background:var(--cream);color:var(--ground)}
 .lang button:focus-visible{outline:2px solid var(--amber)}
-@media (max-width:760px){.top nav a:not(.keep){display:none}.top nav{gap:0}}
+.menu-btn{display:none}
+@media (max-width:760px){
+  .top-in{gap:12px}
+  .lang{margin-left:auto}
+  .menu-btn{all:unset;display:grid;place-items:center;width:42px;height:42px;margin-right:-8px;cursor:pointer;border-radius:999px}
+  .menu-btn:focus-visible{outline:2px solid var(--amber)}
+  .menu-btn span,.menu-btn span::before,.menu-btn span::after{display:block;width:22px;height:1.5px;background:var(--cream);border-radius:2px;transition:transform .25s ease,opacity .2s}
+  .menu-btn span{position:relative}
+  .menu-btn span::before,.menu-btn span::after{content:"";position:absolute;left:0}
+  .menu-btn span::before{top:-7px}
+  .menu-btn span::after{top:7px}
+  .top.open .menu-btn span{background:transparent}
+  .top.open .menu-btn span::before{transform:translateY(7px) rotate(45deg)}
+  .top.open .menu-btn span::after{transform:translateY(-7px) rotate(-45deg)}
+  .top.open{background:rgba(28,20,16,.97);border-bottom-color:var(--line)}
+  .top nav{display:none;position:absolute;left:0;right:0;top:100%;flex-direction:column;gap:0;margin:0;padding:6px var(--gut) 22px;background:rgba(28,20,16,.97);border-bottom:1px solid var(--line)}
+  .top.open nav{display:flex}
+  .top nav a{font-family:var(--serif);font-size:1.6rem;line-height:1.2;color:var(--cream);padding:14px 0;border-bottom:1px solid var(--line)}
+  .top nav a:last-child{border-bottom:0}
+}
 
 /* ---------- hero ---------- */
 .hero{position:relative;min-height:max(640px,100svh);display:grid;align-items:center;overflow:hidden;isolation:isolate}
@@ -296,16 +315,17 @@ footer{padding:56px 0 calc(40px + env(safe-area-inset-bottom,0px));border-top:1p
 <header class="top" id="top">
   <div class="top-in">
     <a class="home" href="#main" aria-label="Kaliforni Records"><img src="img/favicon.svg" alt="" width="84" height="34"></a>
-    <nav aria-label="Hauptnavigation" data-en-aria="Main navigation">
+    <nav id="nav" aria-label="Hauptnavigation" data-en-aria="Main navigation">
       <a href="#name"><span class="de">Über uns</span><span class="en" lang="en">About</span></a>
       <a href="#studio">Studio</a>
-      <a href="#live" class="keep"><span class="de">Konzerte</span><span class="en" lang="en">Concerts</span></a>
+      <a href="#live"><span class="de">Konzerte</span><span class="en" lang="en">Concerts</span></a>
       <a href="#kontakt"><span class="de">Kontakt</span><span class="en" lang="en">Contact</span></a>
     </nav>
     <div class="lang" role="group" aria-label="Sprache / Language">
       <button type="button" data-lang="de" aria-pressed="true">DE</button>
       <button type="button" data-lang="en" aria-pressed="false">EN</button>
     </div>
+    <button class="menu-btn" type="button" aria-controls="nav" aria-expanded="false" aria-label="Menü" data-en-aria="Menu"><span></span></button>
   </div>
 </header>
 
@@ -626,6 +646,13 @@ footer{padding:56px 0 calc(40px + env(safe-area-inset-bottom,0px));border-top:1p
   document.querySelectorAll(".lang button").forEach(function(b){
     b.addEventListener("click",function(){setLang(b.dataset.lang,true)});
   });
+
+  // mobile menu
+  var menuBtn=document.querySelector(".menu-btn"),topBar=document.getElementById("top");
+  function setMenu(open){topBar.classList.toggle("open",open);menuBtn.setAttribute("aria-expanded",String(open))}
+  menuBtn.addEventListener("click",function(){setMenu(!topBar.classList.contains("open"))});
+  document.querySelectorAll("#nav a").forEach(function(a){a.addEventListener("click",function(){setMenu(false)})});
+  document.addEventListener("keydown",function(e){if(e.key==="Escape")setMenu(false)});
 
   // header turns solid once the hero scrolls away
   var top=document.getElementById("top"),hero=document.querySelector(".hero");
